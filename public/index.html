@@ -119,20 +119,43 @@
 
     <!-- JavaScript to handle the form submission -->
     <script>
+
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData();
             const file = document.getElementById('fileInput').files[0];
             formData.append('file', file);
 
-            const response = await fetch('/upload', {
-                method: 'POST',
-                body: formData
-            });
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            const result = await response.text();
-            console.log(result); // Display extracted text
+                if (!response.ok) throw new Error('Failed to upload file');
+
+                const result = await response.json();
+
+                // Display summarized text
+                const summaryContainer = document.createElement('div');
+                summaryContainer.innerHTML = `<h2>Summary</h2><p>${result.summary}</p>`;
+                document.querySelector('.container').appendChild(summaryContainer);
+
+                // Display link to download the PDF
+                const pdfLink = document.createElement('a');
+                pdfLink.href = `/uploads/${result.pdfFilename}`;
+                pdfLink.download = result.pdfFilename;
+                pdfLink.innerText = 'Download Summary PDF';
+                pdfLink.style.display = 'block';
+                pdfLink.style.marginTop = '20px';
+                document.querySelector('.container').appendChild(pdfLink);
+
+            } catch (error) {
+                console.error(error);
+                alert('Error uploading file or generating summary.');
+            }
         });
+
     </script>
 </body>
 

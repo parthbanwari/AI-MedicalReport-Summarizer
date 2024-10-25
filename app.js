@@ -6,16 +6,16 @@ const fs = require('fs');
 
 const PDFDocument = require('pdfkit');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-
+require('dotenv').config();
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
-console.log(genAI);
 
 
 
+app.use('/uploads', express.static('uploads'));
 
-require('dotenv').config();
+
 // Initialize OpenAI with your API key
 
 const app = express();
@@ -66,7 +66,8 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         const dataBuffer = fs.readFileSync(file.path);
         const fileData = await pdfParse(dataBuffer);
         const summary = await summarizeText(fileData.text, genAI);
-        res.send(summary);  // Send the summary back to the client
+        const pdfFilename = `${path.parse(file.originalname).name}_summary.pdf`;
+
         generatePDF(summary, pdfFilename);
 
         // Respond with the summary and PDF filename
