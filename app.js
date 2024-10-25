@@ -3,15 +3,21 @@ const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const path = require('path');
 const fs = require('fs');
-const OpenAI = require('openai');
+
 const PDFDocument = require('pdfkit');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+
+const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+
+console.log(genAI);
+
+
 
 
 require('dotenv').config();
 // Initialize OpenAI with your API key
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+
 const app = express();
 
 // Set up file storage
@@ -39,15 +45,14 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-async function summarizeText(text) {
+async function summarizeText(text, genAI) {
     const prompt = `Summarize this medical report in a way that a non-medical user can understand. Use clear, simple language while maintaining professionalism.\n\nMedical Report:\n${text}\n\nSummary:`;
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
-    });
+    const result = await model.generateContent(prompt);
+    console.log(result.response.text());
 
-    return response.choices[0].message.content; // Return the summary text
+    return result.response.text(); // Return the summary text
 }
 
 // Upload route
@@ -60,7 +65,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     try {
         const dataBuffer = fs.readFileSync(file.path);
         const fileData = await pdfParse(dataBuffer);
-        const summary = await summarizeText(fileData.text);
+        const summary = await summarizeText(fileData.text, genAI);
         res.send(summary);  // Send the summary back to the client
         generatePDF(summary, pdfFilename);
 
