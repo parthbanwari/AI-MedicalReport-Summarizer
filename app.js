@@ -3,22 +3,20 @@ const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const path = require('path');
 const fs = require('fs');
-
 const PDFDocument = require('pdfkit');
+const cors = require('cors'); // Import cors package
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require('dotenv').config();
 
+const app = express(); // Initialize Express app
+
+// Enable CORS for requests from the frontend's port
+app.use(cors({ origin: 'http://localhost:5173' })); // Update with your frontend URL if needed
+
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
-
-
-
+// Serve static files
 app.use('/uploads', express.static('uploads'));
-
-
-// Initialize OpenAI with your API key
-
-const app = express();
 
 // Set up file storage
 const storage = multer.diskStorage({
@@ -38,9 +36,10 @@ function generatePDF(text, filename) {
     doc.pipe(stream);
     doc.fontSize(12).text(text);
     doc.end();
-    return stream; // Return the stream to handle completion
+    return stream;
 }
 
+// Serve index.html for the root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -50,12 +49,9 @@ async function summarizeText(text, genAI) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const result = await model.generateContent(prompt);
-    console.log(result.response.text());
-
-    return result.response.text(); // Return the summary text
+    return result.response.text(); // Return summary text
 }
 
-// Upload route
 app.post('/upload', upload.single('file'), async (req, res) => {
     const file = req.file;
     if (!file) {
@@ -70,7 +66,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
         generatePDF(summary, pdfFilename);
 
-        // Respond with the summary and PDF filename
+        // Send summary and generated PDF file path
         res.json({ summary, pdfFilename });
     } catch (err) {
         console.error(err);
@@ -78,6 +74,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     }
 });
 
+// Start the server
 app.listen(3000, () => {
     console.log('Server started on http://localhost:3000');
 });
