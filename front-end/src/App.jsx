@@ -1,13 +1,14 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import PDFUploader from './PDFUploader';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Summary from './Summary';
+import FileUpload from './FileUpload';
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/upload" element={<PDFUploader />} />
+        <Route path="/" element={<Navigate to="/upload" replace />} />
+        <Route path="/upload" element={<FileUpload />} />
         <Route path="/summary" element={<Summary />} />
       </Routes>
     </Router>

@@ -4,7 +4,7 @@ import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { useNavigate } from "react-router-dom";
 
-const PDFUploader = () => {
+const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [summary, setSummary] = useState(null);
   const fileInputRef = useRef(null);
@@ -115,4 +115,4 @@ const PDFUploader = () => {
   );
 };
 
-export default PDFUploader;
+export default FileUpload;

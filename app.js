@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
 });
 
 async function summarizeText(text, genAI) {
-    const prompt = `Summarize this medical report in a way that a non-medical user can understand. Use clear, simple language while maintaining professionalism.\n\nMedical Report:\n${text}\n\nSummary:`;
+    const prompt = `Summarize this medical report in 3 small paragraph about the illness , medicine and precautions\n\nMedical Report:\n${text}\n\nSummary:`;
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const result = await model.generateContent(prompt);
