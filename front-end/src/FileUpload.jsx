@@ -43,7 +43,7 @@ const FileUpload = () => {
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:3000/upload", { // Corrected endpoint
+      const response = await fetch("https://ai-medicalreport-summarizer.onrender.com/upload", { // Corrected endpoint
         method: "POST",
         body: formData,
       });
