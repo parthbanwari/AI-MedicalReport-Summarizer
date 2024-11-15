@@ -11,7 +11,7 @@ require('dotenv').config();
 const app = express(); // Initialize Express app
 
 // Enable CORS for requests from the frontend's port
-app.use(cors({ origin: 'http://localhost:5173' })); // Update with your frontend URL if needed
+app.use(cors({ origin: 'https://ai-medicalreport-summarizer.onrender.com' })); // Update with your frontend URL if needed
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
