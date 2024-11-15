@@ -75,6 +75,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 // Start the server
-app.listen(3000, () => {
+Const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
     console.log('Server started on http://localhost:3000');
 });
